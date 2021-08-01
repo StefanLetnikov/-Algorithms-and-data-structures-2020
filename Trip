@@ -1,7 +1,5 @@
 import java.util.Scanner;
 
-//вашиот код
-
 class InvalidDate extends Exception {
 
     public InvalidDate(String message) {
