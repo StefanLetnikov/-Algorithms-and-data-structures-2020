@@ -1,0 +1,83 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
+public class OddEvenSort {
+
+    static void oddEvenSort(int a[], int n) {
+        // Vasiot kod tuka
+        int nodd0=0;
+        int neven0=0;
+        int odd [] = new int[n];
+        int even [] = new int[n];
+        for(int i=0;i<n;i++){
+            if(a[i]%2!=0)odd[i]=a[i];
+        }
+        for(int i=0;i<n;i++){
+            if(a[i]%2==0)even[i]=a[i];
+        }
+
+        for(int i=0;i<n;i++){
+            if(odd[i]==0)nodd0++;
+        }
+        for(int i=0;i<n;i++){
+            if(even[i]==0)neven0++;
+        }
+       int temp;
+
+        for (int i = 0; i < ( n - 1 ); i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (odd[j] > odd[j+1])
+                {
+                    temp = odd[j];
+                    odd[j] = odd[j+1];
+                    odd[j+1] = temp;
+                }
+            }
+        }
+
+        for (int i = 0; i < ( n - 1 ); i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (even[j] < even[j+1])
+                {
+                    temp = even[j];
+                    even[j] = even[j+1];
+                    even[j+1] = temp;
+                }
+            }
+        }
+        int pos=0;
+        for(int i=0;i<n;i++){
+            if(odd[i]!=0){
+                a[pos]=odd[i];
+                pos++;
+            }
+        }
+        for(int i=0;i<n;i++){
+            if(even[i]!=0){
+                a[pos]=even[i];
+                pos++;
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException{
+        int i;
+        BufferedReader stdin = new BufferedReader( new InputStreamReader(System.in));
+        String s = stdin.readLine();
+        int n = Integer.parseInt(s);
+
+        s = stdin.readLine();
+        String [] pom = s.split(" ");
+        int [] a = new int[n];
+        for(i=0;i<n;i++)
+            a[i]=Integer.parseInt(pom[i]);
+        oddEvenSort(a,n);
+        for(i=0;i<n-1;i++)
+            System.out.print(a[i]+" ");
+        System.out.print(a[i]);
+    }
+}
