@@ -1,0 +1,120 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+
+interface Stack<E> {
+
+    public boolean isEmpty ();
+
+    public E peek ();
+    
+    public void clear ();
+
+    public void push (E x);
+
+    public E pop ();
+}
+
+class ArrayStack<E> implements Stack<E> {
+    private E[] elems;
+    private int depth;
+
+    @SuppressWarnings("unchecked")
+    public ArrayStack (int maxDepth) {
+        elems = (E[]) new Object[maxDepth];
+        depth = 0;
+    }
+
+    public boolean isEmpty () {
+        return (depth == 0);
+    }
+
+    public E peek () {
+        if (depth == 0)
+            throw new NoSuchElementException();
+        return elems[depth-1];
+    }
+
+    public void clear () {
+        for (int i = 0; i < depth; i++)  elems[i] = null;
+        depth = 0;
+    }
+
+    public void push (E x) {
+        elems[depth++] = x;
+    }
+
+    public E pop () {
+        if (depth == 0)
+            throw new NoSuchElementException();
+        E topmost = elems[--depth];
+        elems[depth] = null;
+        return topmost;
+    }
+}
+
+public class PostFixEvaluation {
+	
+	
+    static int evaluatePostfix(char [] izraz, int n)
+    {
+        boolean najde=false;
+        int broj=0;
+        ArrayStack<Integer> stack = new ArrayStack<>(10);
+    	for(int i=0;i<n;i++)
+        {
+            if(Character.isDigit(izraz[i]))
+            {
+                broj = broj *10 + izraz[i] -'0';
+                najde=true;
+            }
+            else if(izraz[i]=='+')
+            {
+                stack.push(stack.pop()+stack.pop());
+            }
+            else if(izraz[i]=='-')
+            {
+                stack.push(Math.abs(stack.pop()-stack.pop()));
+            }
+            else if(izraz[i]=='*')
+            {
+                stack.push(stack.pop()*stack.pop());
+            }
+            else if(izraz[i]=='/')
+            {
+                int a = stack.pop();
+                int b = stack.pop();
+                if(b==0)
+                    stack.push(0);
+                else if(a<b)
+                    
+                	stack.push(b/a);
+                else
+                    stack.push(a/b);
+            }
+            else
+            {
+                if(najde==true)
+                	stack.push(broj);
+                broj=0;
+                najde=false;
+            }
+        }
+        return stack.pop();
+    }
+	
+	public static void main(String[] args) throws Exception{
+          
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        String expression = br.readLine();
+        char exp[] = expression.toCharArray();
+        
+        int rez = evaluatePostfix(exp, exp.length);
+        System.out.println(rez);
+        
+        br.close();
+
+	}
+
+}
