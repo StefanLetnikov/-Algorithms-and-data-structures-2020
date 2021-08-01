@@ -1,0 +1,62 @@
+import java.util.Scanner;
+import java.util.PriorityQueue;
+import java.util.Collection;
+ 
+public class MVR {
+ 
+    public static void main(String[] args) {
+ 
+        Scanner br = new Scanner(System.in);
+ 
+        PriorityQueue<Gragjanin> red = new PriorityQueue<>();
+        int N = Integer.parseInt(br.nextLine());
+        for(int i=1; i<=N; i++) {
+            String imePrezime = br.nextLine();
+            int lKarta = Integer.parseInt(br.nextLine());
+            int pasos = Integer.parseInt(br.nextLine());
+            int vozacka = Integer.parseInt(br.nextLine());
+           
+            red.add(new Gragjanin(imePrezime,lKarta,pasos,vozacka, i));
+ 
+        }
+ 
+        while(!red.isEmpty()) {
+            System.out.println(red.poll());
+        }
+ 
+ 
+    }
+}
+ 
+class Gragjanin implements Comparable<Gragjanin> {
+    String imePrezime;
+    int lkarta;
+    int pasos;
+    int vozacka;
+    int index;
+ 
+    public Gragjanin(String imePrezime, int lkarta, int pasos, int vozacka, int index) {
+        super();
+        this.imePrezime = imePrezime;
+        this.lkarta = lkarta;
+        this.pasos = pasos;
+        this.vozacka = vozacka;
+        this.index = index;
+    }
+ 
+    public String toString(){
+        return String.format("%s",imePrezime);
+    }
+   
+    @Override
+    public int compareTo(Gragjanin o) {
+        int a = lkarta * 1 + pasos * 2 + vozacka * 4;
+        int b = o.lkarta * 1 + o.pasos * 2 + o.vozacka * 4;
+        if(a == b) {
+            return Integer.compare(index, o.index);
+ 
+        }
+        return Integer.compare(a, b);
+ 
+    }
+}
