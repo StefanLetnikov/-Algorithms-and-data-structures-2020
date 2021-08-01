@@ -1,0 +1,203 @@
+import java.util.Scanner;
+
+//вашиот код
+
+class InvalidDate extends Exception {
+
+    public InvalidDate(String message) {
+        super(message);
+    }
+    //printing method
+    public void showMessage(){
+        System.out.println(super.getMessage());
+    }
+};
+
+abstract class Trip{
+    private String name;
+    private int price;
+
+    public Trip(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public abstract int vratiVremeVoDenovi();
+
+    public static int minPrice(Trip[] niza, int n, Trip holiday){
+        int minimum = 0;
+        for (int i = 0; i < n; i++) {
+                if (niza[i].vratiVremeVoDenovi() > holiday.vratiVremeVoDenovi())
+                    if ( minimum == 0 )
+                        minimum = niza[i].getPrice();
+                    if ( niza[i].getPrice() < minimum )
+                        minimum = niza[i].getPrice();
+        }
+        return minimum;
+    }
+
+}
+
+class FestiveTrip extends Trip{
+    private int startDay;
+    private int startMonth;
+    private int endDay;
+    private int endMonth;
+
+    public FestiveTrip(String name, int price, int startDay, int startMonth, int endDay, int endMonth) {
+        super(name, price);
+        try {
+            if (startDay + startMonth * 30 > endDay + endMonth * 30)
+                throw new InvalidDate("Exception");
+        } catch (InvalidDate e){
+            e.showMessage();
+            int temp;
+            temp = startDay;
+            startDay = endDay;
+            endDay = temp;
+            temp = startMonth;
+            startMonth = endMonth;
+            endMonth = temp;
+        }
+        this.startDay = startDay;
+        this.startMonth = startMonth;
+        this.endDay = endDay;
+        this.endMonth = endMonth;
+    }
+
+    public int getStartDay() {
+        return startDay;
+    }
+
+    public void setStartDay(int startDay) {
+        this.startDay = startDay;
+    }
+
+    public int getStartMonth() {
+        return startMonth;
+    }
+
+    public void setStartMonth(int startMonth) {
+        this.startMonth = startMonth;
+    }
+
+    public int getEndDay() {
+        return endDay;
+    }
+
+    public void setEndDay(int endDay) {
+        this.endDay = endDay;
+    }
+
+    public int getEndMonth() {
+        return endMonth;
+    }
+
+    public void setEndMonth(int endMonth) {
+        this.endMonth = endMonth;
+    }
+
+    @Override
+    public int vratiVremeVoDenovi() {
+        return (endDay + endMonth * 30) - (startDay + startMonth * 30);
+    }
+}
+
+class Vacation extends Trip {
+    private int duration;
+
+    public Vacation(String name, int price, int duration) {
+        super(name, price-1000);
+        this.duration = duration;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    @Override
+    public int vratiVremeVoDenovi() {
+        return this.duration;
+    }
+}
+
+public class Test {
+
+    public static void main(String[] args) {
+        int n;
+        Scanner in=new Scanner(System.in);
+        n=in.nextInt();
+
+        Trip nizaPatuvanje[]=new Trip[n];
+
+        for (int i=0;i<n;i++){
+            int tip=in.nextInt();
+            if (tip==0){
+                String ime=in.next();
+                int cena =in.nextInt();
+                int vreme=in.nextInt();
+                nizaPatuvanje[i]=new Vacation(ime,cena,vreme);
+            }
+            else {
+                String ime=in.next();
+                int cena =in.nextInt();
+                int pocD=in.nextInt();
+                int pocM=in.nextInt();
+                int krajD=in.nextInt();
+                int krajM=in.nextInt();
+                nizaPatuvanje[i]=new FestiveTrip(ime,cena,pocD,pocM, krajD,krajM);
+
+            }
+        }
+
+        //решение на барање 1
+        for( int i = 0 ; i<n; i++) {
+            if (nizaPatuvanje[i] instanceof FestiveTrip) {
+                if (((FestiveTrip) nizaPatuvanje[i]).getStartMonth() == 6)
+                    System.out.print(nizaPatuvanje[i].getName() + " ");
+            }
+        }
+
+        //решение на барање 2
+        double s = 0.0;
+        for( int i = 0 ; i<n; i++) {
+            s+=nizaPatuvanje[i].vratiVremeVoDenovi();
+            }
+  		s/=n;
+        System.out.println();
+        System.out.println(s);
+
+        //решение на барање 3
+        String name = in.next();
+        int price = in.nextInt();
+        int duration = in.nextInt();
+        Vacation holiday = new Vacation(name, price, duration);
+
+        //решение на барање 4
+        System.out.println(Trip.minPrice(nizaPatuvanje, n, holiday));
+
+
+
+    }
+
+}
