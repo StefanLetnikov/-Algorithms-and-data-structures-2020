@@ -1,0 +1,379 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.Map.Entry;
+
+interface Queue<E> {
+
+    // Elementi na redicata se objekti od proizvolen tip.
+
+    // Metodi za pristap:
+
+    public boolean isEmpty();
+    // Vrakja true ako i samo ako redicata e prazena.
+
+    public int size();
+    // Ja vrakja dolzinata na redicata.
+
+    public E peek();
+    // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+
+    // Metodi za transformacija:
+
+    public void clear();
+    // Ja prazni redicata.
+
+    public void enqueue(E x);
+    // Go dodava x na kraj od redicata.
+
+    public E dequeue();
+    // Go otstranuva i vrakja pochetniot element na redicata.
+
+}
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+
+class LinkedQueue<E> implements Queue<E> {
+
+    // Redicata e pretstavena na sledniot nacin:
+    // length go sodrzi brojot na elementi.
+    // Elementite se zachuvuvaat vo jazli dod SLL
+    // front i rear se linkovi do prviot i posledniot jazel soodvetno.
+    SLLNode<E> front, rear;
+    int length;
+
+    // Konstruktor ...
+
+    public LinkedQueue() {
+        clear();
+    }
+
+    public boolean isEmpty() {
+        // Vrakja true ako i samo ako redicata e prazena.
+        return (length == 0);
+    }
+
+    public int size() {
+        // Ja vrakja dolzinata na redicata.
+        return length;
+    }
+
+    public E peek() {
+        // Go vrakja elementot na vrvot t.e. pocetokot od redicata.
+        if (front == null)
+            throw new NoSuchElementException();
+        return front.element;
+    }
+
+    public void clear() {
+        // Ja prazni redicata.
+        front = rear = null;
+        length = 0;
+    }
+
+    public void enqueue(E x) {
+        // Go dodava x na kraj od redicata.
+        SLLNode<E> latest = new SLLNode<E>(x, null);
+        if (rear != null) {
+            rear.succ = latest;
+            rear = latest;
+        } else
+            front = rear = latest;
+        length++;
+    }
+
+    public E dequeue() {
+        // Go otstranuva i vrakja pochetniot element na redicata.
+        if (front != null) {
+            E frontmost = front.element;
+            front = front.succ;
+            if (front == null) rear = null;
+            length--;
+            return frontmost;
+        } else
+            throw new NoSuchElementException();
+    }
+
+}
+
+class GraphNode<E> {
+    private int index;// index (reden broj) na temeto vo grafot
+    private E info;
+    private LinkedList<GraphNode<E>> neighbors;
+
+    public GraphNode(int index, E info) {
+        this.index = index;
+        this.info = info;
+        neighbors = new LinkedList<GraphNode<E>>();
+    }
+
+    boolean containsNeighbor(GraphNode<E> o) {
+        return neighbors.contains(o);
+    }
+
+    void addNeighbor(GraphNode<E> o) {
+        neighbors.add(o);
+    }
+
+    void removeNeighbor(GraphNode<E> o) {
+        if (neighbors.contains(o))
+            neighbors.remove(o);
+    }
+
+    @Override
+    public String toString() {
+        String ret = "INFO:" + info + " SOSEDI:";
+        for (int i = 0; i < neighbors.size(); i++)
+            ret += neighbors.get(i).info + " ";
+        return ret;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        @SuppressWarnings("unchecked")
+        GraphNode<E> pom = (GraphNode<E>) obj;
+        return (pom.info.equals(this.info));
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public E getInfo() {
+        return info;
+    }
+
+    public void setInfo(E info) {
+        this.info = info;
+    }
+
+    public LinkedList<GraphNode<E>> getNeighbors() {
+        return neighbors;
+    }
+
+    public void setNeighbors(LinkedList<GraphNode<E>> neighbors) {
+        this.neighbors = neighbors;
+    }
+}
+
+class Graph<E> {
+
+    int num_nodes;
+    GraphNode<E> adjList[];
+
+    @SuppressWarnings("unchecked")
+    public Graph(int num_nodes, E[] list) {
+        this.num_nodes = num_nodes;
+        adjList = (GraphNode<E>[]) new GraphNode[num_nodes];
+        for (int i = 0; i < num_nodes; i++)
+            adjList[i] = new GraphNode<E>(i, list[i]);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Graph(int num_nodes) {
+        this.num_nodes = num_nodes;
+        adjList = (GraphNode<E>[]) new GraphNode[num_nodes];
+        for (int i = 0; i < num_nodes; i++)
+            adjList[i] = new GraphNode<E>(i, (E) new Object());
+    }
+
+    int adjacent(int x, int y) {
+        // proveruva dali ima vrska od jazelot so
+        // indeks x do jazelot so indeks y
+        return (adjList[x].containsNeighbor(adjList[y])) ? 1 : 0;
+    }
+
+    void addEdge(int x, int y) {
+        // dodava vrska od jazelot so indeks x do jazelot so indeks y
+        if (!adjList[x].containsNeighbor(adjList[y])) {
+            adjList[x].addNeighbor(adjList[y]);
+        }
+    }
+
+    void deleteEdge(int x, int y) {
+        adjList[x].removeNeighbor(adjList[y]);
+    }
+
+    void dfsNonrecursive(int node) {
+        boolean visited[] = new boolean[num_nodes];
+        for (int i = 0; i < num_nodes; i++)
+            visited[i] = false;
+        visited[node] = true;
+        System.out.println(node + ": " + adjList[0].getInfo());
+        Stack<Integer> s = new Stack<Integer>();
+        s.push(node);
+
+        GraphNode<E> pom;
+
+        while (!s.isEmpty()) {
+            pom = adjList[s.peek()];
+            GraphNode<E> tmp = null;
+            for (int i = 0; i < pom.getNeighbors().size(); i++) {
+                tmp = pom.getNeighbors().get(i);
+                if (!visited[tmp.getIndex()])
+                    break;
+            }
+            if (tmp != null&&!visited[tmp.getIndex()]) {
+                visited[tmp.getIndex()] = true;
+                System.out.println(tmp.getIndex() + ": " + tmp.getInfo());
+                s.push(tmp.getIndex());
+            } else
+                s.pop();
+        }
+    }
+
+    @Override
+    public String toString() {
+        String ret = new String();
+        for (int i = 0; i < this.num_nodes; i++)
+            ret += i + ": " + adjList[i] + "\n";
+        return ret;
+    }
+}
+
+public class Lavirint {
+    int start_node;
+    int end_node;
+    Graph<String> graph;
+    Hashtable<String, Integer> hash;
+
+    String getKey(int a) {
+        Set<Entry<String, Integer>> b2 = hash.entrySet();
+
+        for (Iterator<Entry<String, Integer>> it = b2.iterator(); it.hasNext(); ) {
+            Entry<String, Integer> i = it.next();
+
+            if (a == i.getValue())
+                return i.getKey();
+        }
+        return null;
+    }
+
+    public Lavirint() {
+        hash = new Hashtable<String, Integer>();
+    }
+
+    void generateGraph(int rows, int columns, String[] in) {
+        int num_nodes = 0;
+        String key;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (in[i].charAt(j) != '#') {
+                    key = i + "," + j;
+                    hash.put(key, num_nodes);
+                    if (in[i].charAt(j) == 'S') {
+                        start_node = num_nodes;
+                    }
+                    if (in[i].charAt(j) == 'E') {
+                        end_node = num_nodes;
+                    }
+                    num_nodes++;
+                }
+            }
+        }
+        graph = new Graph(num_nodes);
+
+        int x, y;
+
+        for (int i = 1; i < rows - 1; i++) {
+            for (int j = 1; j < columns - 1; j++) {
+                if (in[i].charAt(j) != '#') {
+                    if (in[i].charAt(j - 1) != '#') {
+                        x = hash.get(i + "," + j);
+                        y = hash.get(i + "," + (j - 1));
+                        graph.addEdge(x, y);
+                    }
+                    if (in[i].charAt(j + 1) != '#') {
+                        x = hash.get(i + "," + j);
+                        y = hash.get(i + "," + (j + 1));
+                        graph.addEdge(x, y);
+                    }
+                    if (in[i - 1].charAt(j) != '#') {
+                        x = hash.get(i + "," + j);
+                        y = hash.get((i - 1) + "," + j);
+                        graph.addEdge(x, y);
+                    }
+                    if (in[i + 1].charAt(j) != '#') {
+                        x = hash.get(i + "," + j);
+                        y = hash.get((i + 1) + "," + j);
+                        graph.addEdge(x, y);
+                    }
+                }
+            }
+        }
+    }
+
+    void findPath() {
+        boolean visited[] = new boolean[graph.num_nodes];
+        for (int i = 0; i < graph.num_nodes; i++) {
+            visited[i] = false;
+        }
+        visited[start_node] = true;
+        Stack<Integer> stack = new Stack<Integer>();
+        stack.push(start_node);
+        int pom, pom1;
+        while (!stack.isEmpty()&&stack.peek() != end_node) {
+            pom = stack.peek();
+            pom1 = pom;
+            for (int i = 0; i < graph.num_nodes; i++) {
+                if (graph.adjacent(pom, i) == 1) {
+                    pom1 = i;
+                    if (!visited[i]) {
+                        break;
+                    }
+                }
+            }
+            if (!visited[pom1]) {
+                visited[pom1] = true;
+                stack.push(pom1);
+            } else {
+                stack.pop();
+            }
+        }
+        Stack<Integer> stack1 = new Stack<Integer>();
+        while (!stack.isEmpty()) {
+            stack1.push(stack.pop());
+        }
+        while (!stack1.isEmpty()) {
+            Integer a = stack1.pop();
+            System.out.println(getKey(a));
+        }
+    }
+
+    public static void main(String args[]) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        Lavirint maze = new Lavirint();
+        String line = br.readLine();
+        String[] parts = line.split(",");
+        int rows = Integer.parseInt(parts[0]);
+        int columns = Integer.parseInt(parts[1]);
+        String[] in = new String[rows];
+
+        for (int i = 0; i < rows; i++)
+            in[i] = br.readLine();
+
+        maze.generateGraph(rows, columns, in);
+        maze.findPath();
+
+    }
+
+}
