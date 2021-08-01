@@ -1,0 +1,98 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+
+interface Stack<E> {
+
+    public boolean isEmpty ();
+
+    public E peek ();
+
+    public void clear ();
+
+    public void push (E x);
+
+    public E pop ();
+}
+
+class ArrayStack<E> implements Stack<E> {
+    private E[] elems;
+    private int depth;
+
+    @SuppressWarnings("unchecked")
+    public ArrayStack (int maxDepth) {
+        elems = (E[]) new Object[maxDepth];
+        depth = 0;
+    }
+
+    public boolean isEmpty () {
+        return (depth == 0);
+    }
+
+    public E peek () {
+        if (depth == 0)
+            throw new NoSuchElementException();
+        return elems[depth-1];
+    }
+
+    public void clear () {
+        for (int i = 0; i < depth; i++)  elems[i] = null;
+        depth = 0;
+    }
+
+    public void push (E x) {
+        elems[depth++] = x;
+    }
+
+    public E pop () {
+        if (depth == 0)
+            throw new NoSuchElementException();
+        E topmost = elems[--depth];
+        elems[depth] = null;
+        return topmost;
+    }
+}
+
+public class CheckXML {	
+   	public static int check( String redovi[],ArrayStack<String> tagStack)
+    {
+        for(int i=0;i<redovi.length;i++)
+        {
+            if(redovi[i].charAt(0)=='[')
+            {
+                if(redovi[i].charAt(1)!='/')
+                	tagStack.push(redovi[i].substring(1));
+                else
+                {
+                    if(tagStack.isEmpty())
+                        return 0;
+                    if(tagStack.pop().equals(redovi[i].substring(2))==false)
+                        return 0;
+                }
+                
+            }
+            
+        }
+        if(!tagStack.isEmpty())
+            return 0;
+        return 1;
+    }
+	public static void main(String[] args) throws Exception{
+          
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));  
+        String s = br.readLine();
+		int n = Integer.parseInt(s);
+		String [] redovi = new String[n];
+	
+		for(int i=0;i<n;i++)
+			redovi[i] = br.readLine();
+       
+		int valid;
+        ArrayStack<String> tagStack = new ArrayStack<String>(1000);
+    	
+        valid = check(redovi, tagStack);
+        System.out.println(valid);
+        
+        br.close();
+	}
+}
