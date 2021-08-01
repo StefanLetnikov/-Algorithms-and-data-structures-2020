@@ -1,0 +1,164 @@
+import javax.swing.plaf.IconUIResource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Stack;
+
+class Node<T extends Comparable<T>> {
+    protected T data;
+    protected Node<T> left;
+    protected Node<T> right;
+
+    public Node(T data) {
+        this.data = data;
+    }
+
+    public Node(T data, Node<T> left, Node<T> right) {
+        this.data = data;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+class BTS<T extends Comparable<T>>{
+
+    private Node<T> root;
+
+    public BTS() {};
+
+    private Node<T> insert(Node<T> node, T data){
+        if(node == null)
+            node = new Node<T>(data);
+        else if(data.compareTo(node.data) < 0)
+            node.left = insert(node.left, data);
+        else if(data.compareTo(node.data) > 0)
+            node.right = insert(node.right, data);
+        return node;
+    }
+
+    public void insert(T data){
+        root = insert(root, data);
+    }
+
+    private Node<T> remove (Node<T> node, T data){
+        if(node == null)
+            return null;
+        else if(data.compareTo(node.data) < 0)
+            return remove(node.left, data);
+        else if(data.compareTo(node.data) > 0)
+            return remove(node.right, data);
+        else {
+            if(node.left == null)
+                return node.right;
+            else if(node.right == null)
+                return node.left;
+            else {
+                node.data = findMax(node.left).data;
+                node.right = remove(node.right, node.data);
+            }
+        }
+        return node;
+    }
+
+    public void remove(T data) {
+        root = remove(root, data);
+    }
+
+    private Node<T> find(Node<T> node, T data){
+        if(node == null)
+            return null;
+        else if(data.compareTo(node.data) < 0)
+            return find(node.left, data);
+        else if(data.compareTo(node.data) > 0)
+            return find(node.right, data);
+        else
+            return node;
+    }
+
+    public Node<T> find(T data){
+        return find(root, data);
+    }
+
+    private Node<T> findMin(Node<T> node){
+        if(node == null)
+            return null;
+        else if(root.left == null)
+            return node;
+        return findMin(node.left);
+    }
+
+    public T findMin(){
+        return findMin(root).data;
+    }
+
+    private Node<T> findMax(Node<T> node){
+        if(node == null)
+            return null;
+        if(node.right == null)
+            return node;
+        return findMax(node.right);
+    }
+
+    public T findMax(){
+        return findMax(root).data;
+    }
+
+    public boolean isEmpty(){
+        return root == null;
+    }
+
+    public void makeEmpty(){
+        root = null;
+    }
+
+    private void printTreeRecursive(Node<T> node) {
+        if (node == null) return;
+        System.out.println(node.data);
+        printTreeRecursive(node.left);
+        printTreeRecursive(node.right);
+    }
+
+    public void printTree(){
+        printTreeRecursive(root);
+    }
+
+    public int heightOf(T elem) {
+        Node<T> node = find(root, elem);
+        return getHeight(node);
+    }
+
+    private int getHeight(Node<T> node) {
+        if (node == null)
+            return 0;
+        return Math.max(getHeight(node.left), getHeight(node.right)) + 1;
+    }
+
+    public int onDepth(int v) {
+        return findOnDepth(root, v,0);
+    }
+
+    private int findOnDepth(Node<T> node, int v, int depth) {
+        if (node == null)
+            return 0;
+        else if(depth == v)
+            return 1;
+        return findOnDepth(node.left, v,depth + 1) + findOnDepth(node.right, v,depth + 1);
+    }
+
+}
+
+public class BinarnoDrvo{
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BTS<Integer> bst = new BTS<>();
+        int N = Integer.parseInt(br.readLine());
+        for (int i = 0; i < N; i++) {
+            bst.insert(Integer.valueOf(br.readLine()));
+        }
+        int vallue = Integer.parseInt(br.readLine());
+        br.close();
+        int height = bst.heightOf(vallue);
+        System.out.println(height);
+        System.out.println(bst.onDepth(height));
+    }
+}
